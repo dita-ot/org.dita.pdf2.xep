@@ -5,18 +5,17 @@
  *
  * See the accompanying LICENSE file for applicable license.
  */
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'java-library'
 
-group = 'org.dita-ot.pdf'
-
+group = 'org.dita.pdf2'
+version = '3.6.1'
 description = """DITA Open Toolkit PDF plug-in for RenderX."""
 
 repositories {
     mavenCentral()
 }
 dependencies {
-    implementation rootProject
+    implementation group: 'org.dita-ot', name: 'dost', version: '3.6.0'
 }
 sourceSets {
     main {
@@ -29,14 +28,26 @@ sourceSets {
 jar.archiveFileName = "${project.name}.jar"
 jar.include "com/idiominc/**"
 
-task copyInstall(type: Copy) {
-    from (jar)
-    destinationDir = file("lib")
-}
-
-task copyDistTemp(type: Copy) {
-    from (jar) {
-        into "plugins/org.dita.pdf2.xep/lib"
+task dist(type: Zip, dependsOn: [jar]) {
+    from(configurations.archives.artifacts.files) {
+        into("lib")
     }
-    destinationDir = file("${rootProject.buildDir}/tmp/dist")
+    from(".") {
+        include "LICENSE"
+        include "README.md"
+    }
+    from(".") {
+        include "build.xml"
+        include "cfg/**"
+        include "xsl/**"
+    }
+    from(".") {
+        include "plugin.xml"
+        expand(
+                id: "${project.group}.${project.archivesBaseName}",
+                version: project.version,
+                jar: "lib/${jar.archiveFileName.get()}"
+        )
+    }
+    archiveFileName = "${project.group}.${project.archivesBaseName}-${project.version}.zip"
 }
