@@ -8,7 +8,7 @@
 apply plugin: 'java-library'
 
 group = 'org.dita.pdf2'
-version = '3.6.2'
+version = '3.6.3'
 description = """DITA Open Toolkit PDF plug-in for RenderX."""
 
 repositories {
